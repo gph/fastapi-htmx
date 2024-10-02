@@ -23,9 +23,9 @@ class TodoRepository:
         """Create Todo"""
         todos.append(todo)
 
-    # async def update_todo(self, todo: Todo) -> None:
-    #     """Update Todo"""
-    #     for _, todo_db in enumerate(todos):
-    #         if todo_db.id == todo.id:
-    #             todo_db.text = todo.text
-    #             break
+    async def update_todo(self, todo_id: str, text: str) -> None:
+        """Update Todo"""
+        for _, todo_db in enumerate(todos):
+            if str(todo_db.id) == todo_id:
+                todo_db.text = text
+                break

@@ -28,11 +28,7 @@ class TodoService:
         todo = Todo(text=todo_dto.text)
         await self.todo_repository.create_todo(todo)
 
-    async def update_todo(self, todo_dto: TodoDTO) -> None:
+    async def update_todo(self, todo_id: str, text: str) -> None:
         """Update todo"""
 
-        todos = await self.todo_repository.get_todos()
-        for _, todo in enumerate(todos):
-            if str(todo.id) == todo_dto.id:
-                todo.text = todo_dto.text
-                break
+        await self.todo_repository.update_todo(todo_id, text)

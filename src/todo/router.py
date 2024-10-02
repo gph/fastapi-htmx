@@ -65,6 +65,5 @@ async def update_todo(
 ):
     """Update todos"""
 
-    todo_dto = TodoDTO(id=todo_id, text=text)
-    await todo_service.update_todo(todo_dto)
+    await todo_service.update_todo(todo_id, text)
     return RedirectResponse(url="/todos", status_code=status.HTTP_204_NO_CONTENT)
