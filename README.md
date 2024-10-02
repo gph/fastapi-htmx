@@ -1,0 +1,1 @@
+# POC - FastAPI + HTMX
