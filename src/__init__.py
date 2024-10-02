@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 
-from src.todo.routes import todo_router
+from src.todo.router import todo_router
 
 VERSION = "v1"
 DESCRIPTION = "Learning about FastAPI + HTMX"

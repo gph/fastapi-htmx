@@ -2,17 +2,17 @@
 
 from typing import Annotated, Union
 
-from fastapi import APIRouter, Depends, Form, Header, Request
+from fastapi import APIRouter, Depends, Form, Header, Request, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from src.todo.repository import TodoRepository
-from src.todo.schemas import Todo
-
-todo_router = APIRouter()
+from src.todo.schemas import TodoDTO
+from src.todo.service import TodoService
 
 templates = Jinja2Templates(directory="src/templates")
+
+todo_router = APIRouter()
 
 
 @todo_router.get("/", response_class=HTMLResponse)
@@ -25,11 +25,11 @@ async def index(request: Request):
 async def list_todos(
     request: Request,
     hx_request: Annotated[Union[str, None], Header()] = None,
-    todo_repository: TodoRepository = Depends(TodoRepository),
+    todo_service: TodoService = Depends(),
 ):
     """List all todos"""
 
-    todos = await todo_repository.get_todos()
+    todos = await todo_service.get_todos()
     if hx_request:
         return templates.TemplateResponse(
             request=request,
@@ -44,11 +44,27 @@ async def list_todos(
 async def create_todo(
     request: Request,
     todo: Annotated[str, Form()],
-    todo_repository: TodoRepository = Depends(TodoRepository),
+    todo_service: TodoService = Depends(),
 ):
     """Create todo from Forms"""
-    await todo_repository.create_todo(Todo(todo))
-    todos = await todo_repository.get_todos()
+    todo = TodoDTO(text=todo)
+    await todo_service.create_todo(todo)
+
+    # redirect or something...
+    todos = await todo_service.get_todos()
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
+
+
+@todo_router.put("/todos/{todo_id}", response_class=HTMLResponse)
+async def update_todo(
+    todo_id: str,
+    text: Annotated[str, Form()],
+    todo_service: TodoService = Depends(TodoService),
+):
+    """Update todos"""
+
+    todo_dto = TodoDTO(id=todo_id, text=text)
+    await todo_service.update_todo(todo_dto)
+    return RedirectResponse(url="/todos", status_code=status.HTTP_204_NO_CONTENT)
